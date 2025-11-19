@@ -43,7 +43,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build ve Push (Context Fix)
+    - name: Build ve Push (Fix Context)
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: sock-shop/${{ matrix.service }}
@@ -52,21 +52,23 @@ jobs:
         SERVICE_PATH="./src/${{ matrix.service }}"
         echo "İşlem yapılan servis: $SERVICE_PATH"
         
-        # Varsayılan değerler
+        # Varsayılan ayarlar (Çoğu servis için geçerli)
         BUILD_CONTEXT="$SERVICE_PATH"
         DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
 
-        # Cartservice için ÖZEL AYAR (Sorunu çözen kısım burası)
+        # Cartservice için ÖZEL AYAR (Sorunu çözen kısım)
         if [ "${{ matrix.service }}" == "cartservice" ]; then
-          echo "🔧 Cartservice tespit edildi. Path ayarları düzeltiliyor..."
+          echo "🔧 Cartservice tespit edildi. Path ve Context düzeltiliyor..."
+          # Dockerfile alt klasörde
           DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
-          BUILD_CONTEXT="$SERVICE_PATH" # Context ana klasör olmalı
+          # Ama inşaat sahası (Context) ana klasör olmalı ki .csproj dosyasını görebilsin
+          BUILD_CONTEXT="$SERVICE_PATH"
         fi
 
         echo "Build Context: $BUILD_CONTEXT"
         echo "Dockerfile: $DOCKERFILE_PATH"
 
-        # Build
+        # Docker Build komutu (Düzeltilmiş yollarla)
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $BUILD_CONTEXT
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $BUILD_CONTEXT
         
