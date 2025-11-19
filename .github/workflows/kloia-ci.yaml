@@ -8,7 +8,6 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    
     permissions:
       id-token: write
       contents: read
@@ -44,7 +43,7 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build ve Push (Akıllı Dockerfile Bulucu)
+    - name: Build ve Push (Context Fix)
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: sock-shop/${{ matrix.service }}
@@ -53,22 +52,23 @@ jobs:
         SERVICE_PATH="./src/${{ matrix.service }}"
         echo "İşlem yapılan servis: $SERVICE_PATH"
         
-        # Dockerfile nerede? Ara ve Bul!
-        if [ -f "$SERVICE_PATH/Dockerfile" ]; then
-          DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
-          echo "✅ Standart Dockerfile bulundu."
-        elif [ -f "$SERVICE_PATH/src/Dockerfile" ]; then
+        # Varsayılan değerler
+        BUILD_CONTEXT="$SERVICE_PATH"
+        DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
+
+        # Cartservice için ÖZEL AYAR (Sorunu çözen kısım burası)
+        if [ "${{ matrix.service }}" == "cartservice" ]; then
+          echo "🔧 Cartservice tespit edildi. Path ayarları düzeltiliyor..."
           DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
-          echo "⚠️ Dockerfile alt klasörde (src) bulundu. Cartservice için özel yol kullanılıyor."
-        else
-          echo "❌ HATA: Dockerfile hiçbir yerde bulunamadı!"
-          exit 1
+          BUILD_CONTEXT="$SERVICE_PATH" # Context ana klasör olmalı
         fi
-        
-        # Bulunan Dockerfile yolunu (-f) kullanarak Build et
-        # Önemli: Build Context (sondaki nokta benzeri path) hala servisin ana klasörü olmalı
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $SERVICE_PATH
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $SERVICE_PATH
+
+        echo "Build Context: $BUILD_CONTEXT"
+        echo "Dockerfile: $DOCKERFILE_PATH"
+
+        # Build
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $BUILD_CONTEXT
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $BUILD_CONTEXT
         
         # Push
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
