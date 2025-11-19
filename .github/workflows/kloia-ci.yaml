@@ -1,0 +1,53 @@
+name: Kloia Case CI Pipeline (AWS ECR)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    # AWS ile güvenli iletişim için izinler
+    permissions:
+      id-token: write
+      contents: read
+
+    strategy:
+      matrix:
+        # Terraform ile açtığımız ECR repo isimleriyle birebir aynı olmalı
+        service: [front-end, catalogue, user, cart, orders, payment, shipping, queue-master]
+
+    steps:
+    - name: Kodları Çek (Checkout)
+      uses: actions/checkout@v3
+
+    - name: AWS Kimlik Doğrulaması
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Amazon ECR'a Giriş Yap
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build ve Push (ECR)
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: sock-shop/${{ matrix.service }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        echo "İşlem başlıyor: $ECR_REPOSITORY"
+        
+        # 1. Docker Image Build (Versiyonla ve Latest etiketiyle)
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./src/${{ matrix.service }}
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./src/${{ matrix.service }}
+        
+        # 2. Docker Image Push (AWS ECR'a Yükleme)
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        
+        echo "Başarıyla yüklendi!"
