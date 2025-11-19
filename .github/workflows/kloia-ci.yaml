@@ -1,4 +1,4 @@
-name: Kloia Case CI Pipeline (AWS ECR)
+name: Kloia Case CI Pipeline (Google Demo Structure)
 
 on:
   push:
@@ -15,9 +15,21 @@ jobs:
       contents: read
 
     strategy:
+      fail-fast: false # Bir servis hata verirse diğerlerini durdurma
       matrix:
-        # Terraform ile açtığımız ECR repo isimleriyle birebir aynı olmalı
-        service: [front-end, catalogue, user, cart, orders, payment, shipping, queue-master]
+        # Google reposundaki 'src' altındaki GERÇEK klasör isimleri
+        service: [
+          adservice,
+          cartservice,
+          checkoutservice,
+          currencyservice,
+          emailservice,
+          frontend,
+          paymentservice,
+          productcatalogservice,
+          recommendationservice,
+          shippingservice
+        ]
 
     steps:
     - name: Kodları Çek (Checkout)
@@ -40,14 +52,15 @@ jobs:
         ECR_REPOSITORY: sock-shop/${{ matrix.service }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        echo "İşlem başlıyor: $ECR_REPOSITORY"
+        echo "Klasör kontrol ediliyor: ./src/${{ matrix.service }}"
+        ls -la ./src/${{ matrix.service }}
         
-        # 1. Docker Image Build (Versiyonla ve Latest etiketiyle)
+        # 1. Docker Image Build
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./src/${{ matrix.service }}
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./src/${{ matrix.service }}
         
-        # 2. Docker Image Push (AWS ECR'a Yükleme)
+        # 2. Docker Image Push
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         
-        echo "Başarıyla yüklendi!"
+        echo "Başarıyla yüklendi: $ECR_REPOSITORY"
