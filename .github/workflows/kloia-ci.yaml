@@ -9,15 +9,13 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     
-    # AWS ile güvenli iletişim için izinler
     permissions:
       id-token: write
       contents: read
 
     strategy:
-      fail-fast: false # Bir servis hata verirse diğerlerini durdurma
+      fail-fast: false
       matrix:
-        # Google reposundaki 'src' altındaki GERÇEK klasör isimleri
         service: [
           adservice,
           cartservice,
@@ -32,7 +30,7 @@ jobs:
         ]
 
     steps:
-    - name: Kodları Çek (Checkout)
+    - name: Kodları Çek
       uses: actions/checkout@v3
 
     - name: AWS Kimlik Doğrulaması
@@ -46,21 +44,34 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build ve Push (ECR)
+    - name: Build ve Push (Akıllı Dockerfile Bulucu)
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: sock-shop/${{ matrix.service }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        echo "Klasör kontrol ediliyor: ./src/${{ matrix.service }}"
-        ls -la ./src/${{ matrix.service }}
+        SERVICE_PATH="./src/${{ matrix.service }}"
+        echo "İşlem yapılan servis: $SERVICE_PATH"
         
-        # 1. Docker Image Build
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./src/${{ matrix.service }}
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest ./src/${{ matrix.service }}
+        # Dockerfile nerede? Ara ve Bul!
+        if [ -f "$SERVICE_PATH/Dockerfile" ]; then
+          DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
+          echo "✅ Standart Dockerfile bulundu."
+        elif [ -f "$SERVICE_PATH/src/Dockerfile" ]; then
+          DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
+          echo "⚠️ Dockerfile alt klasörde (src) bulundu. Cartservice için özel yol kullanılıyor."
+        else
+          echo "❌ HATA: Dockerfile hiçbir yerde bulunamadı!"
+          exit 1
+        fi
         
-        # 2. Docker Image Push
+        # Bulunan Dockerfile yolunu (-f) kullanarak Build et
+        # Önemli: Build Context (sondaki nokta benzeri path) hala servisin ana klasörü olmalı
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $SERVICE_PATH
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $SERVICE_PATH
+        
+        # Push
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
         
-        echo "Başarıyla yüklendi: $ECR_REPOSITORY"
+        echo "🚀 Başarıyla tamamlandı: $ECR_REPOSITORY"
