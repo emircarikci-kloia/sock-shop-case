@@ -52,23 +52,22 @@ jobs:
         SERVICE_PATH="./src/${{ matrix.service }}"
         echo "İşlem yapılan servis: $SERVICE_PATH"
         
-        # Varsayılan ayarlar (Çoğu servis için geçerli)
+        # Varsayılan ayarlar (Çoğu servis için)
         BUILD_CONTEXT="$SERVICE_PATH"
         DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
 
-        # Cartservice için ÖZEL AYAR (Sorunu çözen kısım)
+        # Cartservice için ÖZEL AYAR (Kritik Düzeltme Burası)
         if [ "${{ matrix.service }}" == "cartservice" ]; then
-          echo "🔧 Cartservice tespit edildi. Path ve Context düzeltiliyor..."
-          # Dockerfile alt klasörde
+          echo "🔧 Cartservice için özel yol ayarlanıyor..."
+          # Hem Dockerfile hem de Context 'src' alt klasörüne inmeli
           DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
-          # Ama inşaat sahası (Context) ana klasör olmalı ki .csproj dosyasını görebilsin
-          BUILD_CONTEXT="$SERVICE_PATH"
+          BUILD_CONTEXT="$SERVICE_PATH/src" 
         fi
 
         echo "Build Context: $BUILD_CONTEXT"
         echo "Dockerfile: $DOCKERFILE_PATH"
 
-        # Docker Build komutu (Düzeltilmiş yollarla)
+        # Docker Build
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $BUILD_CONTEXT
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $BUILD_CONTEXT
         
