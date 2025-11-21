@@ -1,8 +1,8 @@
-name: Kloia Case CI Pipeline (Google Demo Structure)
+name: Kloia Case CI Pipeline 
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
@@ -11,7 +11,7 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
+    
     strategy:
       fail-fast: false
       matrix:
@@ -27,52 +27,51 @@ jobs:
           recommendationservice,
           shippingservice
         ]
-
+    
     steps:
-    - name: Kodları Çek
-      uses: actions/checkout@v3
+      - name: Kodlari Cek
+        uses: actions/checkout@v3
+      
+      - name: AWS Kimlik Dogrulamasi
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-    - name: AWS Kimlik Doğrulaması
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+      - name: Amazon ECR'a Giris Yap
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Amazon ECR'a Giriş Yap
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Build ve Push 
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: sock-shop/${{ matrix.service }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          SERVICE_PATH="./src/${{ matrix.service }}"
+          echo "Islem yapilan servis: $SERVICE_PATH "
 
-    - name: Build ve Push (Fix Context)
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: sock-shop/${{ matrix.service }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        SERVICE_PATH="./src/${{ matrix.service }}"
-        echo "İşlem yapılan servis: $SERVICE_PATH"
-        
-        # Varsayılan ayarlar (Çoğu servis için)
-        BUILD_CONTEXT="$SERVICE_PATH"
-        DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
+          # Varsayilan ayarlar 
+          BUILD_CONTEXT="$SERVICE_PATH"
+          DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
 
-        # Cartservice için ÖZEL AYAR (Kritik Düzeltme Burası)
-        if [ "${{ matrix.service }}" == "cartservice" ]; then
-          echo "🔧 Cartservice için özel yol ayarlanıyor..."
-          # Hem Dockerfile hem de Context 'src' alt klasörüne inmeli
-          DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
-          BUILD_CONTEXT="$SERVICE_PATH/src" 
-        fi
+          #Cartservice icin Ozel ayarlar
+          if [ "${{ matrix.service }}" == "cartservice" ]; then
+            echo "Cartservice icin ozel yol ayarlaniyor..."
+            DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
+            BUILD_CONTEXT="$SERVICE_PATH/src"
+          fi
 
-        echo "Build Context: $BUILD_CONTEXT"
-        echo "Dockerfile: $DOCKERFILE_PATH"
+          echo "Build Context: $BUILD_CONTEXT"
+          echo "Dockerfile: $DOCKERFILE_PATH"
 
-        # Docker Build
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $BUILD_CONTEXT
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $BUILD_CONTEXT
-        
-        # Push
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
-        
-        echo "🚀 Başarıyla tamamlandı: $ECR_REPOSITORY"
+          #Docker build
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $BUILD_CONTEXT
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $BUILD_CONTEXT
+
+          #Push
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+          echo "Basariyla tamamlandi: $ECR_REPOSITORY"
