@@ -107,7 +107,7 @@ resource "aws_ecr_repository" "microservices" {
   }
 }
 
-resource "helm_release" "monitoring" {
+/*resource "helm_release" "monitoring" {
   name       = "prometheus-stack"
 
   repository = "https://prometheus-community.github.io/helm-charts"
@@ -117,4 +117,4 @@ resource "helm_release" "monitoring" {
 
   # Cluster kurulmadan Helm çalışmasın diye:
   depends_on = [module.eks]
-}
+}*/
