@@ -6,7 +6,9 @@
 .project
 .skaffold-*.yaml
 .terraform.lock.hcl
-.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform/
 .venv/
 .vs/
 .vscode/
