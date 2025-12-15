@@ -64,7 +64,7 @@ adService:
   name: adservice
   resources:
     requests:
-      cpu: 200m
+      cpu: 50m
       memory: 180Mi
     limits:
       cpu: 300m
@@ -75,7 +75,7 @@ cartService:
   name: cartservice
   resources:
     requests:
-      cpu: 200m
+      cpu: 50m
       memory: 128Mi
     limits:
       cpu: 300m
@@ -139,7 +139,7 @@ frontend:
     targetCPU: 50
   resources:
     requests:
-      cpu: 30m
+      cpu: 50m
       memory: 64Mi
     limits:
       cpu: 200m
