@@ -132,6 +132,11 @@ frontend:
       namespace: asm-ingress
       labelKey: asm
       labelValue: ingressgateway
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPU: 50
   resources:
     requests:
       cpu: 100m
@@ -139,11 +144,7 @@ frontend:
     limits:
       cpu: 200m
       memory: 128Mi
-  hpa:
-    enabled: true
-    minReplicas: 1
-    maxReplicas: 5
-    targetCPU: 50
+  
 
 loadGenerator:
   create: true
