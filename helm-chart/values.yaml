@@ -149,9 +149,9 @@ frontend:
     vault.hashicorp.com/agent-inject-secret-config: "secret/data/sock-shop-config" #secret yolu 
 
 loadGenerator:
-  create: true
+  create: false
   name: loadgenerator
-  replicas: 1
+  replicas: 0
   checkFrontendInitContainer: true
   resources:
     requests:
@@ -222,7 +222,7 @@ cartDatabase:
     endpointAddress: ""
     endpointPort: ""
     certificate: ""
-    
+
 # @TODO: This service is not currently available in Helm.
 # https://github.com/GoogleCloudPlatform/microservices-demo/tree/main/kustomize/components/shopping-assistant
 shoppingAssistantService:
