@@ -69,7 +69,7 @@ module "eks" {
     green = {
       min_size     = 1
       max_size     = 4
-      desired_size = 4
+      desired_size = 3
 
       instance_types = ["t3.medium"] # kucuk olsun
       capacity_type  = "SPOT"
