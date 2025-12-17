@@ -144,6 +144,10 @@ frontend:
     limits:
       cpu: 200m
       memory: 128Mi
+  podAnnotations:
+    vault.hashicorp.com/agent-inject: "true" #injection true
+    vault.hashicorp.com/role: "sock-shop-role" #rol adı
+    vault.hashicorp.com/agent-inject-secret-config: "secret/data/sock-shop-config" #secret yolu 
   
 
 loadGenerator:

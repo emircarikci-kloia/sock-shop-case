@@ -53,11 +53,11 @@ jobs:
           SERVICE_PATH="./src/${{ matrix.service }}"
           echo "Islem yapilan servis: $SERVICE_PATH "
 
-          # Varsayilan ayarlar 
+          # varsayilan 
           BUILD_CONTEXT="$SERVICE_PATH"
           DOCKERFILE_PATH="$SERVICE_PATH/Dockerfile"
 
-          #Cartservice icin Ozel ayarlar
+          # cartservice ozel ayarlari
           if [ "${{ matrix.service }}" == "cartservice" ]; then
             echo "Cartservice icin ozel yol ayarlaniyor..."
             DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
@@ -67,12 +67,47 @@ jobs:
           echo "Build Context: $BUILD_CONTEXT"
           echo "Dockerfile: $DOCKERFILE_PATH"
 
-          #Docker build
+          #build
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_PATH $BUILD_CONTEXT
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:latest -f $DOCKERFILE_PATH $BUILD_CONTEXT
 
-          #Push
+          #push
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
           echo "Basariyla tamamlandi: $ECR_REPOSITORY"
+  
+  update-helm-values:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Git'e yazmak için gerekli izin
+    steps:
+      - name: Kodlari Cek
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: main # Guncel branch'i cek
+
+      - name: Helm Values Guncelle (GitOps Trigger)
+        run: |
+          git config --global user.email "ci-bot@kloia.com"
+          git config --global user.name "CI Bot"
+          
+          # values.yaml dosyasında tag'i güncelle
+          VALUES_FILE="./helm-chart/values.yaml"
+          NEW_TAG="${{ github.sha }}"
+          
+          # YQ aracı ile güvenli güncelleme
+          # (GitHub runner'larda yq yüklüdür)
+          yq -i ".images.tag = \"$NEW_TAG\"" $VALUES_FILE
+          
+          # Değişiklik varsa commit ve push yap
+          if [[ -n $(git status -s) ]]; then
+            git add $VALUES_FILE
+            git commit -m "Update image tag to $NEW_TAG [skip ci]"
+            git push
+            echo "GitOps repository updated with new tag: $NEW_TAG"
+          else
+            echo "No changes to commit."
+          fi
