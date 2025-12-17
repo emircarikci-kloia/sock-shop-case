@@ -44,6 +44,9 @@ spec:
         app: {{ .Values.frontend.name }}
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
+        {{- if .Values.frontend.podAnnotations }}
+        {{- toYaml .Values.frontend.podAnnotations | nindent 8 }}
+        {{- end }}
     spec:
       {{- if .Values.serviceAccounts.create }}
       serviceAccountName: {{ .Values.frontend.name }}
