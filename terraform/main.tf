@@ -107,14 +107,12 @@ resource "aws_ecr_repository" "microservices" {
   }
 }
 
-/*resource "helm_release" "monitoring" {
-  name       = "prometheus-stack"
-
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = "monitoring"
-  create_namespace = true
-
-  # Cluster kurulmadan Helm çalışmasın diye:
-  depends_on = [module.eks]
-}*/
+resource "aws_security_group_rule" "vault_webhook" {
+  type              = "ingress"
+  from_port         = 8080
+  to_port           = 8080
+  protocol          = "tcp"
+  security_group_id = module.eks.node_security_group_id # node id
+  source_security_group_id = module.eks.cluster_security_group_id # cluster id
+  description       = "Control Plane vault injector erisimine izin"
+}

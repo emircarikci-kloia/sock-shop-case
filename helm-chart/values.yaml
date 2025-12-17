@@ -135,9 +135,9 @@ frontend:
     vault.hashicorp.com/role: "sock-shop-role" #rol adı
     vault.hashicorp.com/agent-inject-secret-config: "secret/data/sock-shop-config" #secret yolu 
 loadGenerator:
-  create: false
+  create: true
   name: loadgenerator
-  replicas: 0
+  replicas: 1
   checkFrontendInitContainer: true
   resources:
     requests:
