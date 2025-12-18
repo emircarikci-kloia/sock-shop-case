@@ -2,7 +2,7 @@ name: Kloia Case CI Pipeline
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main"] # main branch'e gelen her committe tetiklenir
   workflow_dispatch:
 
 jobs:
@@ -35,7 +35,7 @@ jobs:
       
       - name: AWS Kimlik Dogrulamasi
         uses: aws-actions/configure-aws-credentials@v2
-        with:
+        with: #oidc
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
@@ -47,8 +47,8 @@ jobs:
       - name: Build ve Push 
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: sock-shop/${{ matrix.service }}
-          IMAGE_TAG: ${{ github.sha }}
+          ECR_REPOSITORY: sock-shop/${{ matrix.service }} # her servis kendi kendi ecr reposuna
+          IMAGE_TAG: ${{ github.sha }} 
         run: |
           SERVICE_PATH="./src/${{ matrix.service }}"
           echo "Islem yapilan servis: $SERVICE_PATH "
@@ -59,7 +59,7 @@ jobs:
 
           # cartservice ozel ayarlari
           if [ "${{ matrix.service }}" == "cartservice" ]; then
-            echo "Cartservice icin ozel yol ayarlaniyor..."
+            echo "cartservice yolu! "
             DOCKERFILE_PATH="$SERVICE_PATH/src/Dockerfile"
             BUILD_CONTEXT="$SERVICE_PATH/src"
           fi
@@ -75,10 +75,10 @@ jobs:
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-          echo "Basariyla tamamlandi: $ECR_REPOSITORY"
+          echo "basariyla tamamlandi: $ECR_REPOSITORY"
   
   update-helm-values:
-    needs: build-and-push
+    needs: build-and-push #build bitmeden çalışma
     runs-on: ubuntu-latest
     permissions:
       contents: write # Git'e yazmak için gerekli izin
@@ -94,15 +94,12 @@ jobs:
           git config --global user.email "ci-bot@kloia.com"
           git config --global user.name "CI Bot"
           
-          # values.yaml dosyasında tag'i güncelle
+          # values.yaml dosyasinda tag'i güncelle
           VALUES_FILE="./helm-chart/values.yaml"
           NEW_TAG="${{ github.sha }}"
           
-          # YQ aracı ile güvenli güncelleme
-          # (GitHub runner'larda yq yüklüdür)
           yq -i ".images.tag = \"$NEW_TAG\"" $VALUES_FILE
           
-          # Değişiklik varsa commit ve push yap
           if [[ -n $(git status -s) ]]; then
             git add $VALUES_FILE
             git commit -m "Update image tag to $NEW_TAG [skip ci]"

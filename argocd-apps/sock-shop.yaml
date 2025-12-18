@@ -1,23 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: sock-shop
-  namespace: argocd
+  name: sock-shop #argocd de gözükecek ad
+  namespace: argocd 
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/emircarikci-kloia/sock-shop-case.git
-    targetRevision: HEAD
+    repoURL: https://github.com/emircarikci-kloia/sock-shop-case.git #default repo
+    targetRevision: HEAD #güncel main branch
     path: helm-chart 
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: sock-shop
+    namespace: sock-shop #kendi namespace 
   syncPolicy:
     automated:
       enabled: true
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=true # namespace'i otomatik aç

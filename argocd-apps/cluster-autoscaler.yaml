@@ -6,22 +6,22 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://kubernetes.github.io/autoscaler
+    repoURL: https://kubernetes.github.io/autoscaler #autoscaler repo
     chart: cluster-autoscaler
     targetRevision: 9.37.0
     helm:
       parameters:
         - name: autoDiscovery.clusterName
-          value: sock-shop-cluster
+          value: sock-shop-cluster #terraformda bu adı verdim
         - name: awsRegion
           value: eu-central-1
         - name: rbac.serviceAccount.annotations.eks\.amazonaws\.com/role-arn
-          value: arn:aws:iam::946489931484:role/cluster-autoscaler-role
+          value: arn:aws:iam::946489931484:role/cluster-autoscaler-role #IAM rolünü verdim. pod aws yetkisi aldı. 
         - name: rbac.serviceAccount.name
           value: cluster-autoscaler
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: kube-system #sistem bileşeni
   syncPolicy:
     automated:
       prune: true
