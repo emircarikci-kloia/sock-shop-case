@@ -52,7 +52,7 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 19.0"
+  version = "~> 19.21"
 
   cluster_name    = "sock-shop-cluster"
   cluster_version = "1.32" 
