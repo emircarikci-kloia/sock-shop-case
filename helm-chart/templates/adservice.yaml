@@ -35,6 +35,7 @@ metadata:
   labels:
     app: {{ .Values.adService.name }}
 spec:
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: {{ .Values.adService.name }}

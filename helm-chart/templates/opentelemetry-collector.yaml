@@ -33,6 +33,7 @@ metadata:
   name: {{ .Values.opentelemetryCollector.name }}
   namespace: {{ .Release.Namespace }}
 spec:
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
     matchLabels:

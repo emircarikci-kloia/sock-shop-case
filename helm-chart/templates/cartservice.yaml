@@ -33,6 +33,7 @@ metadata:
   labels:
     app: {{ .Values.cartService.name }}
 spec:
+  revisionHistoryLimit: 1
   selector:
     matchLabels:
       app: {{ .Values.cartService.name }}
