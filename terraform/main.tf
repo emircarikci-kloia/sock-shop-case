@@ -116,3 +116,24 @@ resource "aws_security_group_rule" "vault_webhook" {
   source_security_group_id = module.eks.cluster_security_group_id # cluster id
   description       = "Control Plane vault injector erisimine izin"
 }
+
+module "cluster_autoscaler_irsa" {
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "~> 5.0"
+
+  role_name                        = "cluster-autoscaler-role"
+  attach_cluster_autoscaler_policy = true
+  cluster_autoscaler_cluster_ids   = [module.eks.cluster_name]
+
+  oidc_providers = {
+    ex = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:cluster-autoscaler"]
+    }
+  }
+}
+
+output "cluster_autoscaler_role_arn" {
+  description = "Cluster Autoscaler IAM Role ARN"
+  value       = module.cluster_autoscaler_irsa.iam_role_arn
+}
