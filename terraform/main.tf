@@ -11,8 +11,8 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "kloia-case-state-emir-unique" # 1. Adımda yarattığın bucket ismi
-    key            = "prod/terraform.tfstate"       # Dosyanın S3 içindeki yolu
+    bucket         = "kloia-case-state-emir-unique" # 1.adımda yarattığım bucket ismi
+    key            = "prod/terraform.tfstate"       #dosyanın S3 içindeki yolu
     region         = "eu-central-1"
     encrypt        = true
   }
