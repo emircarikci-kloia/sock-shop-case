@@ -59,7 +59,7 @@ adService:
       memory: 180Mi
     limits:
       cpu: 300m
-      memory: 300Mi
+      memory: 600Mi
 cartService:
   create: true
   name: cartservice
@@ -69,7 +69,7 @@ cartService:
       memory: 128Mi
     limits:
       cpu: 300m
-      memory: 256Mi
+      memory: 350Mi
 checkoutService:
   create: true
   name: checkoutservice
@@ -79,7 +79,7 @@ checkoutService:
       memory: 64Mi
     limits:
       cpu: 200m
-      memory: 128Mi
+      memory: 256Mi
 currencyService:
   create: true
   name: currencyservice
@@ -145,7 +145,7 @@ loadGenerator:
       memory: 128Mi
     limits:
       cpu: 100m
-      memory: 256Mi
+      memory: 512Mi
 paymentService:
   create: true
   name: paymentservice
