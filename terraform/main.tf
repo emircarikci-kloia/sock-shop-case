@@ -137,3 +137,47 @@ output "cluster_autoscaler_role_arn" {
   description = "Cluster Autoscaler IAM Role ARN"
   value       = module.cluster_autoscaler_irsa.iam_role_arn
 }
+
+resource "aws_iam_openid_connect_provider" "github" {
+  url             = "https://token.actions.githubusercontent.com"
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["6938fd4d98bab03faadb97b34396831e3780aea1"]
+}
+
+resource "aws_iam_role" "github_actions_role" {
+  name = "kloia-sock-shop-actions-role" # Rol ismini belirledik
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Condition = {
+          StringLike = {
+            # BURASI KRİTİK: Sadece senin reponun main branch'ine izin veriyoruz
+            "token.actions.githubusercontent.com:sub" : "repo:emircarikci-kloia/sock-shop-case:ref:refs/heads/main"
+          }
+          StringEquals = {
+            "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+          }
+        }
+      },
+    ]
+  })
+}
+
+# 3. Rol Yetkisi (ECR PowerUser)
+resource "aws_iam_role_policy_attachment" "ecr_power_user" {
+  role       = aws_iam_role.github_actions_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
+}
+
+# 4. Çıktı (Bunu YAML'a yapıştıracaksın)
+output "github_role_arn" {
+  description = "YAML dosyasina eklenecek ARN adresi"
+  value       = aws_iam_role.github_actions_role.arn
+}

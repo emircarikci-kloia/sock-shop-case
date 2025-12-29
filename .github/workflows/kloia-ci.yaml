@@ -33,11 +33,10 @@ jobs:
       - name: Kodlari Cek
         uses: actions/checkout@v3
       
-      - name: AWS Kimlik Dogrulamasi
-        uses: aws-actions/configure-aws-credentials@v2
+      - name: AWS Kimlik Dogrulamasi (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
         with: #oidc
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: arn:aws:iam::946489931484:role/kloia-sock-shop-actions-role
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Amazon ECR'a Giris Yap
