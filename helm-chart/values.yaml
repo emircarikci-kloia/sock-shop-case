@@ -19,7 +19,7 @@
 images:
   repository: 946489931484.dkr.ecr.eu-central-1.amazonaws.com/sock-shop
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "14796a6ea6604e6352f325bdac766bf3b633cd77"
+  tag: "1550a5bfd29bfecdd3544b176f1a57b2a9df3c07"
 serviceAccounts:
   # Specifies whether service accounts should be created.
   create: true
@@ -123,11 +123,11 @@ frontend:
     minReplicas: 1
     maxReplicas: 5
     targetCPU: 30
-  env: 
+  env:
     - name: DB_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: sock-shop-db-secret 
+          name: sock-shop-db-secret
           key: password
   resources:
     requests:
@@ -136,10 +136,11 @@ frontend:
     limits:
       cpu: 200m
       memory: 128Mi
-  # podAnnotations:
-   # vault.hashicorp.com/agent-inject: "true" #injection true
-   # vault.hashicorp.com/role: "sock-shop-role" #rol adı
-   # vault.hashicorp.com/agent-inject-secret-config: "secret/data/sock-shop-config" #secret yolu 
+      # podAnnotations:
+# vault.hashicorp.com/agent-inject: "true" #injection true
+# vault.hashicorp.com/role: "sock-shop-role" #rol adı
+# vault.hashicorp.com/agent-inject-secret-config: "secret/data/sock-shop-config" #secret yolu 
+
 loadGenerator:
   create: true
   name: loadgenerator
