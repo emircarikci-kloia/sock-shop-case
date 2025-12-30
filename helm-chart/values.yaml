@@ -123,6 +123,12 @@ frontend:
     minReplicas: 1
     maxReplicas: 5
     targetCPU: 30
+  env: 
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: sock-shop-db-secret 
+          key: password
   resources:
     requests:
       cpu: 50m
@@ -130,10 +136,10 @@ frontend:
     limits:
       cpu: 200m
       memory: 128Mi
-  podAnnotations:
-    vault.hashicorp.com/agent-inject: "true" #injection true
-    vault.hashicorp.com/role: "sock-shop-role" #rol adı
-    vault.hashicorp.com/agent-inject-secret-config: "secret/data/sock-shop-config" #secret yolu 
+  # podAnnotations:
+   # vault.hashicorp.com/agent-inject: "true" #injection true
+   # vault.hashicorp.com/role: "sock-shop-role" #rol adı
+   # vault.hashicorp.com/agent-inject-secret-config: "secret/data/sock-shop-config" #secret yolu 
 loadGenerator:
   create: true
   name: loadgenerator
