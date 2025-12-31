@@ -17,6 +17,10 @@ spec:
           value: "true" # dev modunda -hafızada- çalışsın, storage ile uğraşmamak için
         - name: "ui.enabled"
           value: "true"
+        - name: "ui.serviceType"
+          value: "LoadBalancer"
+        - name: "ui.serviceNodePort"
+          value: "null"
   destination:
     server: https://kubernetes.default.svc
     namespace: vault
