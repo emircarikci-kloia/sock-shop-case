@@ -20,10 +20,9 @@ spec:
           enabled: true
           serviceType: "LoadBalancer"
           serviceNodePort: null
-          # Port 80 ayarı:
           service:
             port: 80
-          # Internet-facing ayarı (Burada hata vermez):
+            targetPort: 8200
           annotations:
             service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
   destination:
