@@ -32,6 +32,8 @@ kind: Deployment
 metadata:
   name: {{ .Values.productCatalogService.name }}
   namespace: {{ .Release.Namespace }}
+  annotations:  # <--- BU KISMI EKLEYİN
+    secret.reloader.stakater.com/reload: "sock-shop-db-secret"
   labels:
     app: {{ .Values.productCatalogService.name }}
 spec:
@@ -92,6 +94,11 @@ spec:
         {{- end }}
         - name: EXTRA_LATENCY
           value: {{ .Values.productCatalogService.extraLatency }}
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: sock-shop-db-secret
+              key: password
         readinessProbe:
           grpc:
             port: 3550
