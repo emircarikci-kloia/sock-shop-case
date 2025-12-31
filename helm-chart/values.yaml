@@ -123,12 +123,6 @@ frontend:
     minReplicas: 1
     maxReplicas: 5
     targetCPU: 30
-  env:
-    - name: DB_PASSWORD
-      valueFrom:
-        secretKeyRef:
-          name: sock-shop-db-secret
-          key: password
   resources:
     requests:
       cpu: 50m
