@@ -12,10 +12,13 @@ spec:
     targetRevision: 66.3.0 
     chart: kube-prometheus-stack #kullanılacak chart adı
     helm:
-      parameters:
-        - name: "grafana.service.type"
-          value: "LoadBalancer"
       releaseName: prometheus-stack
+      values: |
+        grafana:
+          service:
+            type: LoadBalancer
+            annotations:
+              service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: monitoring #hedef namespace

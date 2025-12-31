@@ -12,15 +12,20 @@ spec:
     repoURL: https://helm.releases.hashicorp.com
     targetRevision: 0.28.0 
     helm:
-      parameters:
-        - name: "server.dev.enabled"
-          value: "true" # dev modunda -hafızada- çalışsın, storage ile uğraşmamak için
-        - name: "ui.enabled"
-          value: "true"
-        - name: "ui.serviceType"
-          value: "LoadBalancer"
-        - name: "ui.serviceNodePort"
-          value: "null"
+      values: |
+        server:
+          dev:
+            enabled: true
+        ui:
+          enabled: true
+          serviceType: "LoadBalancer"
+          serviceNodePort: null
+          # Port 80 ayarı:
+          service:
+            port: 80
+          # Internet-facing ayarı (Burada hata vermez):
+          annotations:
+            service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
   destination:
     server: https://kubernetes.default.svc
     namespace: vault
