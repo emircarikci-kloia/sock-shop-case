@@ -134,6 +134,11 @@ spec:
             value: {{ .Values.shoppingAssistantService.create | quote }}
           - name: ENABLE_SINGLE_SHARED_SESSION
             value: {{ .Values.frontend.singleSharedSession | quote }}
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: sock-shop-db-secret
+                key: password
           resources:
             {{- toYaml .Values.frontend.resources | nindent 12 }}
 ---
