@@ -108,7 +108,6 @@ frontend:
   # One of: local, gcp, aws, azure, onprem, alibaba. When not set, defaults to "local" unless running in GKE, otherwise auto-sets to gcp.
   platform: local
   singleSharedSession: false
-  replicas: 1
   virtualService:
     create: false
     hosts:
@@ -138,7 +137,6 @@ frontend:
 loadGenerator:
   create: true
   name: loadgenerator
-  replicas: 1
   checkFrontendInitContainer: true
   resources:
     requests:
