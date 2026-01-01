@@ -21,3 +21,14 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true # namespace'i otomatik aç
+  ignoreDifferences:
+  - group: apps
+    kind: Deployment
+    name: loadgenerator
+    jsonPointers:
+    - /spec/replicas
+  - group: apps
+    kind: Deployment
+    name: frontend
+    jsonPointers:
+    - /spec/replicas
