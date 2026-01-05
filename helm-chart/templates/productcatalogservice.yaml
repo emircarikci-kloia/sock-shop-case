@@ -33,7 +33,7 @@ metadata:
   name: {{ .Values.productCatalogService.name }}
   namespace: {{ .Release.Namespace }}
   annotations:  
-    secret.reloader.stakater.com/reload: "sock-shop-db-secret"
+    secret.reloader.stakater.com/reload: "sock-shop-db-secret" # reloader tetikleyicisi, bu degişirse yeniden başlat 
   labels:
     app: {{ .Values.productCatalogService.name }}
 spec:
@@ -97,8 +97,8 @@ spec:
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: sock-shop-db-secret
-              key: password
+              name: sock-shop-db-secret # şifreyi bu kubernetes secretından al
+              key: password #içindeki passwordu oku 
         readinessProbe:
           grpc:
             port: 3550

@@ -164,7 +164,7 @@ kind: Service
 metadata:
   name: {{ .Values.frontend.name }}-external
   annotations:
-    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing" # public loadbalancer
   namespace: {{ .Release.Namespace }}
 spec:
   type: LoadBalancer

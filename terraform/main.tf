@@ -49,11 +49,11 @@ module "vpc" {
     Environment = "dev"
   }
 
-  public_subnet_tags = {
+  public_subnet_tags = { # dışarı açılacaklar public
     "kubernetes.io/role/elb" = 1
   }
 
-  private_subnet_tags = {
+  private_subnet_tags = { # internal olanları private subnet
     "kubernetes.io/role/internal-elb" = 1
   }
 }
@@ -153,20 +153,20 @@ resource "aws_iam_openid_connect_provider" "github" {
 }
 
 resource "aws_iam_role" "github_actions_role" {
-  name = "kloia-sock-shop-actions-role" # Rol ismini belirledik
+  name = "kloia-sock-shop-actions-role" # rol ismi 
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = "sts:AssumeRoleWithWebIdentity"
+        Action = "sts:AssumeRoleWithWebIdentity" # bu rol oidc ile alınabilir 
         Effect = "Allow"
         Principal = {
-          Federated = aws_iam_openid_connect_provider.github.arn
+          Federated = aws_iam_openid_connect_provider.github.arn # Sadece yukarıda tanımladığımız GitHub sağlayıcısı bu rolü alabilir
         }
         Condition = {
           StringLike = {
-            # BURASI KRİTİK: Sadece senin reponun main branch'ine izin veriyoruz
+            # sadece senin reponun main branch'ine izin veriyoruz
             "token.actions.githubusercontent.com:sub" : "repo:emircarikci-kloia/sock-shop-case:ref:refs/heads/main"
           }
           StringEquals = {
@@ -178,13 +178,11 @@ resource "aws_iam_role" "github_actions_role" {
   })
 }
 
-# 3. Rol Yetkisi (ECR PowerUser)
-resource "aws_iam_role_policy_attachment" "ecr_power_user" {
+resource "aws_iam_role_policy_attachment" "ecr_power_user" { # ecr için role yetki verme
   role       = aws_iam_role.github_actions_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser"
 }
 
-# 4. Çıktı (Bunu YAML'a yapıştıracaksın)
 output "github_role_arn" {
   description = "YAML dosyasina eklenecek ARN adresi"
   value       = aws_iam_role.github_actions_role.arn
