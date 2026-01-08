@@ -166,7 +166,7 @@ resource "aws_iam_role" "github_actions_role" {
         }
         Condition = {
           StringLike = {
-            # sadece senin reponun main branch'ine izin veriyoruz
+            # sadece reponun main branch'ine izin veriyoruz
             "token.actions.githubusercontent.com:sub" : "repo:emircarikci-kloia/sock-shop-case:ref:refs/heads/main"
           }
           StringEquals = {
