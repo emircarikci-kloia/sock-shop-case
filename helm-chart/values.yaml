@@ -19,7 +19,7 @@
 images:
   repository: 946489931484.dkr.ecr.eu-central-1.amazonaws.com/sock-shop
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "0d4323769e87aef9c291c94d9155c72af93aef9a"
+  tag: "1e09031143d0bd924930444f1e7aa2a3d5ebc887"
 serviceAccounts:
   # Specifies whether service accounts should be created.
   create: true
