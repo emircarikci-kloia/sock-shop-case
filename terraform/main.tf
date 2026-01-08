@@ -184,6 +184,6 @@ resource "aws_iam_role_policy_attachment" "ecr_power_user" { # ecr için role ye
 }
 
 output "github_role_arn" {
-  description = "YAML dosyasina eklenecek ARN adresi"
+  description = "add to YAML adress"
   value       = aws_iam_role.github_actions_role.arn
 }

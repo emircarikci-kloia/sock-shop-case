@@ -36,7 +36,7 @@ jobs:
       - name: AWS Kimlik Dogrulamasi (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
         with: #oidc
-          role-to-assume: arn:aws:iam::946489931484:role/kloia-sock-shop-actions-role
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Amazon ECR'a Giris Yap
