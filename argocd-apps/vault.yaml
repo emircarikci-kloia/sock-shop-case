@@ -10,7 +10,7 @@ spec:
   source:
     chart: vault
     repoURL: https://helm.releases.hashicorp.com
-    targetRevision: 0.28.0 
+    targetRevision: 0.28.0
     helm:
       values: |
         server:
@@ -21,13 +21,14 @@ spec:
             VAULT_API_ADDR: "http://0.0.0.0:8200"
         ui:
           enabled: true
-          serviceType: "LoadBalancer"
+          serviceType: "ClusterIP" 
           serviceNodePort: null
-          service:
-            port: 80
-            targetPort: 8200
-          annotations:
-            service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hosts:
+              - host: vault.18.185.226.7.nip.io
+            pathType: Prefix
   destination:
     server: https://kubernetes.default.svc
     namespace: vault

@@ -1,31 +1,35 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: monitoring #argocd adı 
-  namespace: argocd #nerede duracagı
+  name: monitoring
+  namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://prometheus-community.github.io/helm-charts #resmi helm 
-    targetRevision: 66.3.0 
-    chart: kube-prometheus-stack #kullanılacak chart adı
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 66.3.0
+    chart: kube-prometheus-stack
     helm:
       releaseName: prometheus-stack
       values: |
         grafana:
           service:
-            type: LoadBalancer
-            annotations:
-              service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+            type: ClusterIP # LoadBalancer yerine ClusterIP yapıldı
+          ingress:
+            enabled: true
+            ingressClassName: nginx
+            hosts:
+              - grafana.18.185.226.7.nip.io
+            path: /
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: monitoring #hedef namespace
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true 
-      - ServerSideApply=true 
+      - CreateNamespace=true
+      - ServerSideApply=true
