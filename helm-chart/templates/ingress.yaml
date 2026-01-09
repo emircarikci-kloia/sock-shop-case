@@ -1,0 +1,22 @@
+{{- if .Values.ingress.enabled -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sock-shop-ingress
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+  - host: {{ .Values.ingress.hosts.0.host }}
+    http:
+      paths:
+      - path: {{ .Values.ingress.hosts.0.paths.0.path }}
+        pathType: {{ .Values.ingress.hosts.0.paths.0.pathType }}
+        backend:
+          service:
+            name: {{ .Values.frontend.name }}
+            port:
+              number: 80
+{{- end }}

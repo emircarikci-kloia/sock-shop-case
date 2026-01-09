@@ -103,7 +103,7 @@ emailService:
 frontend:
   create: true
   name: frontend
-  externalService: true
+  externalService: false
   cymbalBranding: false
   # One of: local, gcp, aws, azure, onprem, alibaba. When not set, defaults to "local" unless running in GKE, otherwise auto-sets to gcp.
   platform: local
@@ -207,3 +207,12 @@ cartDatabase:
 shoppingAssistantService:
   create: false
   name: shoppingassistantservice
+
+ingress:
+  enabled: true
+  className: "nginx"
+  hosts:
+    - host: sock-shop.127.0.0.1.nip.io # (Bunu daha sonra güncelleyeceğiz)
+      paths:
+        - path: /
+          pathType: Prefix
