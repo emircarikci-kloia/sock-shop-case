@@ -19,7 +19,7 @@
 images:
   repository: 946489931484.dkr.ecr.eu-central-1.amazonaws.com/sock-shop
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2bfcba978a285169bb1f7e5529e2cdffca7be5df"
+  tag: "bc2d4a0fb73b7dd9df3370626a787878b0bc0ef3"
 
 serviceAccounts:
   # Specifies whether service accounts should be created.
@@ -221,7 +221,7 @@ cartDatabase:
     endpointAddress: ""
     endpointPort: ""
     certificate: ""
-    
+
 # @TODO: This service is not currently available in Helm.
 # https://github.com/GoogleCloudPlatform/microservices-demo/tree/main/kustomize/components/shopping-assistant
 shoppingAssistantService:
