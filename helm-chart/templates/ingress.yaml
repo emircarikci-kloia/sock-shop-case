@@ -9,14 +9,18 @@ metadata:
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
-  - host: {{ .Values.ingress.hosts.0.host }}
+  {{- range .Values.ingress.hosts }}
+  - host: {{ .host | quote }}
     http:
       paths:
-      - path: {{ .Values.ingress.hosts.0.paths.0.path }}
-        pathType: {{ .Values.ingress.hosts.0.paths.0.pathType }}
+      {{- range .paths }}
+      - path: {{ .path }}
+        pathType: {{ .pathType }}
         backend:
           service:
-            name: {{ .Values.frontend.name }}
+            name: {{ $.Values.frontend.name }}
             port:
               number: 80
+      {{- end }}
+  {{- end }}
 {{- end }}
