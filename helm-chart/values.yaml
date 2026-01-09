@@ -19,7 +19,7 @@
 images:
   repository: 946489931484.dkr.ecr.eu-central-1.amazonaws.com/sock-shop
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "056a43aac03a915217e24629b579e06c84b79e25"
+  tag: "f7c46714899f0e83cb0e46d12174ece13f8bd723"
 serviceAccounts:
   # Specifies whether service accounts should be created.
   create: true
@@ -207,7 +207,6 @@ cartDatabase:
 shoppingAssistantService:
   create: false
   name: shoppingassistantservice
-
 ingress:
   enabled: true
   className: "nginx"
