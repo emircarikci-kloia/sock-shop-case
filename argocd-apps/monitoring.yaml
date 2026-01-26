@@ -21,7 +21,7 @@ spec:
             enabled: true
             ingressClassName: nginx
             hosts:
-              - grafana.52.59.105.208.nip.io
+              - grafana.52.57.83.49.nip.io
             path: /
   destination:
     server: 'https://kubernetes.default.svc'

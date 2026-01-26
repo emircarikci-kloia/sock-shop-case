@@ -211,7 +211,7 @@ ingress:
   enabled: true
   className: "nginx"
   hosts:
-    - host: sock-shop.52.59.105.208.nip.io # daha sonra domain yap
+    - host: sock-shop.52.57.83.49.nip.io # daha sonra domain yap
       paths:
         - path: /
           pathType: Prefix

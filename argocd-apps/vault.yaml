@@ -27,7 +27,7 @@ spec:
             enabled: true
             ingressClassName: nginx
             hosts:
-              - host: vault.52.59.105.208.nip.io
+              - host: vault.52.57.83.49.nip.io
             pathType: Prefix
   destination:
     server: https://kubernetes.default.svc
